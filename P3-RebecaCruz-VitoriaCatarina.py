@@ -7,6 +7,7 @@ Prof. Pedro Torres
 
 === TRABALHO FINAL ===
 Dupla: Rebeca Cruz e Vitória Catarina
+
 DINAMIPY é um jogo de tentativa-erro baseado na Equação de Lotka-Volterra.
 
     1. O jogador escolhe um ambiente (Aquático ou Terrestre) e define os parâmetros
@@ -23,6 +24,9 @@ DINAMIPY é um jogo de tentativa-erro baseado na Equação de Lotka-Volterra.
     terminal (via argparse) ou informados durante a execução, quando solicitados.
 
 Observação: Recomendamos que realize um "git clone" do nosso repositório pelo terminal.
+| -->  1. No terminal, localize sua pasta ""Documentos."
+| -->  2. Digite: git clone https://github.com/rbeqsinstem/dinamipy.git
+| -->  3. Você terá uma pasta chamada "dinamipy" com o programa.
 '''
 # %% Importando bibliotecas/módulos necessários:
 import os
@@ -32,7 +36,7 @@ import pandas as pd
 import argparse
 #  -- > Interação com o usuário.
 import plotly.graph_objects as go
-#  -->  Gráfico interativo.
+#  -->  Gráfico interativo. 
 #%% Ambiente da população:
 '''
 Há dois ambientes disponíveis acompanhados de populações pré-definidas para cada tipo de dictambiente.
@@ -213,14 +217,14 @@ def pergdecimal (texto):
             return valor
 
 
-def pasta_resultados():
+def pastaresultados ():
     nome_pasta = "Resultados"
     if not os.path.exists(nome_pasta):
         os.makedirs(nome_pasta)
     return nome_pasta
 
 # %% Gerando CSV dos dados digitados pelo usuário.
-def gerar_csv(pasta, amb, anos, historico, params, resultado):
+def gerarcsv (pasta, amb, anos, historico, params, resultado):
     ''' 
     Gera um CSV com o histórico de todas as tentativas e os parâmetros usados em cada uma.
     O intuito deste CSV é gerar a possibilidade de treinar ferramentas de ML para deixar este código com uma maior acurácia de resultados.
@@ -260,13 +264,13 @@ def gerar_csv(pasta, amb, anos, historico, params, resultado):
         "Anos" : anos
     })
 
-    nome_arquivo = os.path.join(pasta, f"simulacao_{amb.nome}.csv") #Salva o arquivo .CSV na pasta 'Resultados'
+    nomearquivo = os.path.join(pasta, f"simulacao_{amb.nome}.csv") #Salva o arquivo .CSV na pasta 'Resultados'
 
     try:
-        df.to_csv(nome_arquivo) #Transforma o DataFrame em arquivo .CSV
+        df.to_csv(nomearquivo) #Transforma o DataFrame em arquivo .CSV
     except OSError as erro:
-        raise OSError(f"Não foi possível salvar o CSV em '{nome_arquivo}': {erro}") #Caso não seja possível salvar o arquivo, retornará esta mensagem de erro.
-    return nome_arquivo
+        raise OSError(f"Não foi possível salvar o CSV em '{nomearquivo}': {erro}") #Caso não seja possível salvar o arquivo, retornará esta mensagem de erro.
+    return nomearquivo
 
 #%% Execução principal (__main__): Lê os argumentos do menu e executa o jogo.
 if __name__ == "__main__":
@@ -284,7 +288,6 @@ if __name__ == "__main__":
         tipo = args.amb
         if tipo not in dictambiente:  #Verifica se o valor passado pelo argparse é válido.
             print("Ambiente inválido! Digite [1] para Aquático ou [2] para Terrestre.")
-            tipo = pergambiente()  #Solicita o ambiente por input, já que o valor do argparse era inválido.
     else:
         tipo = pergambiente()  #Caso contrário, solicita o ambiente por input.
     dictambiente = Ambiente(tipo)
@@ -295,19 +298,17 @@ if __name__ == "__main__":
         anos = perginteiro ("Quantos anos quer simular?") #Caso contrário, solicita o valor por input.
 
     tentativa = 1
-    max_tentativas = 3
+    maxtentativas = 3
     ganhou = False #Indica que o jogador ainda não venceu.
 
     jogotodo = []  # Armazena o histórico completo de todas as tentativas.
     paramsrod = {} # Armazena os parâmetros utilizados em cada tentativa.
     resultadorod = {} # Armazena se cada tentativa foi "Ganhou" ou "Perdeu".
 
-    while tentativa <= max_tentativas and ganhou == False: #Repete o jogo até vencer ou atingir o limite de tentativas.
+    while tentativa <=  maxtentativas and ganhou == False: #Repete o jogo até vencer ou atingir o limite de tentativas.
+        print("--> Tentativa", tentativa, "de", maxtentativas)
 
-        print("")
-        print("--> Tentativa", tentativa, "de", max_tentativas)
-
-        # so usa o valor do argparse na tentativa 1, depois sempre pergunta de novo
+        # O valor do argpase é utilizado apenas na primeira tentativa, depois o input para outras tentativas é solicitado.
         if tentativa == 1 and args.a is not None:
             a = args.a
         else:
@@ -351,18 +352,22 @@ if __name__ == "__main__":
             jogotodo.append((tentativa, ponto[0], ponto[1], ponto[2])) #Adiciona cada ponto da simulação ao histórico geral.
 
         if ganhou:
-            print("*** VOCE GANHOU O DINAMIPY! ***")
-            print("As duas populaçôes sobreviveram os", anos, "anos, na tentativa", tentativa)
+            print("*** VOCE GANHOU O DINAMIPY! \\ ٩( ᐛ )و / ***")
+            print("As duas populaçôes sobreviveram os", anos, "anos", " | Tentativa:", tentativa)
         else:
             print("Não deu certo dessa vez: Tentativa:", tentativa)
-            if tentativa < max_tentativas:
+            if tentativa <  maxtentativas:
                 print("Tente de novo com outros valores.")
 
-        tentativa_vencedora = tentativa
+        tenativavencedora = tentativa
         tentativa = tentativa + 1
 
-    pasta = pasta_resultados()
-    gerar_csv(pasta, dictambiente, anos, jogotodo, paramsrod, resultadorod)
+    pasta = pastaresultados ()
+    '''Gerando o arquivo csv com os dados das rodadas.
+    A funcionalidade do arquivo .CSV com os dados de cada rodada, é para possívelmente treinar uma ferramenta de ML.
+        | --> Gerar uma maior acurácia nos resultados.
+    '''
+    gerarcsv (pasta, dictambiente, anos, jogotodo, paramsrod, resultadorod)
 
     if ganhou:
         eixo_tempo = []
@@ -383,14 +388,14 @@ if __name__ == "__main__":
                                   name=dictambiente.predador, line=dict(color="firebrick", width=4)))
 
         fig.update_layout(
-            title="Modelo Predador-Presa - " + dictambiente.nome + " (tentativa vencedora: " + str(tentativa_vencedora) + ")",
+            title="Modelo Predador-Presa " + dictambiente.nome + " | Tentativa vencedora: " + str(tenativavencedora),
             xaxis_title="Tempo (anos)",
-            yaxis_title="Populacao",
+            yaxis_title="População",
             template="plotly_white"
         )
 
         fig.show()
 
     else:
-        print("Fim de jogo! Todos foram extintos.")
+        print("Fim de jogo! Todos foram extintos. U ´꓃ ` U")
         print("O histórico das tentativas foi salvo no CSV.")
