@@ -1,7 +1,0 @@
-,Rodada,Tempo,Presas,Predadores,Alpha,Beta,Gamma,Delta,x0,y0,Resultado,Ambiente,Anos
-0,1,0.0,60,180.0,90.0,2.0,120.0,2.0,60,180,Perdeu,Terrestre,20
-1,1,0.01,0,180.0,90.0,2.0,120.0,2.0,60,180,Perdeu,Terrestre,20
-2,2,0.0,60,180.0,6.0,6.0,6.0,6.0,60,180,Perdeu,Terrestre,20
-3,2,0.01,0,817.2,6.0,6.0,6.0,6.0,60,180,Perdeu,Terrestre,20
-4,3,0.0,60,120.0,6.0,4.0,6.0,4.0,60,120,Perdeu,Terrestre,20
-5,3,0.01,0,400.8,6.0,4.0,6.0,4.0,60,120,Perdeu,Terrestre,20
