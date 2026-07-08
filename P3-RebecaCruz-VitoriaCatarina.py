@@ -74,9 +74,9 @@ Os parâmetros são:
 class PredadorPresa:
     def __init__(self, alpha, beta, gamma, delta, x0, y0): #Esta função define os parâmetros iniciais da classe.
         #Todos os parâmetros devem ser maiores do que 0 de acordo com a Equação de Lotka-Volterra.
-        if alpha > 0 or beta > 0 or gamma > 0 or delta > 0:
+        if alpha < 0 or beta < 0 or gamma < 0 or delta < 0:
             raise ValueError("Todos os valores tem que ser maior que zero!")
-        if x0 > 0 or y0 > 0:
+        if x0 < 0 or y0 < 0:
             raise ValueError("A População inicial tem que ser maior que zero!")
 
         self.alpha = alpha 
