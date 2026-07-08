@@ -74,9 +74,9 @@ Os parâmetros são:
 class PredadorPresa:
     def __init__(self, alpha, beta, gamma, delta, x0, y0): #Esta função define os parâmetros iniciais da classe.
         #Todos os parâmetros devem ser maiores do que 0 de acordo com a Equação de Lotka-Volterra.
-        if alpha < 0 or beta < 0 or gamma < 0 or delta < 0:
+        if alpha > 0 or beta > 0 or gamma > 0 or delta > 0:
             raise ValueError("Todos os valores tem que ser maior que zero!")
-        if x0 < 0 or y0 < 0:
+        if x0 > 0 or y0 > 0:
             raise ValueError("A População inicial tem que ser maior que zero!")
 
         self.alpha = alpha 
@@ -144,6 +144,7 @@ class PredadorPresa:
 def criando_menu():
     '''
     O argpase será uma opção para usuários optarem à passar os valores de forma rápida.
+    Ideal para quem já sabe os valores que irão dar certo.
     '''
 
     menu = argparse.ArgumentParser(prog="DINAMIPY", description="Um jogo de tentativa e erro," \
@@ -288,6 +289,7 @@ if __name__ == "__main__":
         tipo = args.amb
         if tipo not in dictambiente:  #Verifica se o valor passado pelo argparse é válido.
             print("Ambiente inválido! Digite [1] para Aquático ou [2] para Terrestre.")
+            tipo = pergambiente()  #Solicita o ambiente por input, já que o valor do argparse era inválido.
     else:
         tipo = pergambiente()  #Caso contrário, solicita o ambiente por input.
     dictambiente = Ambiente(tipo)
@@ -341,6 +343,14 @@ if __name__ == "__main__":
             y = args.y
         else:
             y = perginteiro ("População inicial de predadores: ")
+        #Verifica se o ponto de equilíbrio do sistema está de acordo com o que estabelecemos (>1) antes de simular.
+        xeq = g / d
+        yeq = a / b
+        if xeq < 1 or yeq < 1:
+            print(f"Ponto de equilíbrio inviável: (x = {xeq}, y = {yeq}). "
+                  "O jogo considera extinção para populações menores que 1, escolha outros valores para continuar!!")
+            args.a = args.b = args.x = args.d = args.g = args.y = None #Caso possua dados do argpase, na próxima rodada ele desconsiderará estes valores.
+            continue #Volta ao início do loop utilizando o método input() para que o usuário digite novos valores.
 
         jogo = PredadorPresa(a, b, g, d, x, y)  #Cria um objeto da classe PredadorPresa utilizando os parâmetros informados.
         historico, ganhou = jogo.simulacao(anos)  #Executa a simulação e retorna o histórico e o resultado da tentativa.
@@ -363,39 +373,41 @@ if __name__ == "__main__":
         tentativa = tentativa + 1
 
     pasta = pastaresultados ()
+    print(f"Gerando a pasta 'Resultados' dentro de dinamipy em: {os.path.abspath(pasta)}")
     '''Gerando o arquivo csv com os dados das rodadas.
     A funcionalidade do arquivo .CSV com os dados de cada rodada, é para possívelmente treinar uma ferramenta de ML.
         | --> Gerar uma maior acurácia nos resultados.
     '''
     gerarcsv (pasta, dictambiente, anos, jogotodo, paramsrod, resultadorod)
 
-    if ganhou:
-        eixo_tempo = []
-        eixo_presas = []
-        eixo_predadores = []
+    eixotempo = []
+    eixopresas = []
+    eixopredadores = []
 
-        for ponto in historico:
-            eixo_tempo.append(ponto[0])
-            eixo_presas.append(ponto[1])
-            eixo_predadores.append(ponto[2])
+    for ponto in historico:
+        eixotempo.append(ponto[0])
+        eixopresas.append(ponto[1])
+        eixopredadores.append(ponto[2])
 
-        fig = go.Figure()
+    fig = go.Figure()
 
-        fig.add_trace(go.Scatter(x=eixo_tempo, y=eixo_presas, mode="lines",
-                                  name=dictambiente.presa, line=dict(color="royalblue", width=4)))
+    fig.add_trace(go.Scatter(x=eixotempo, y=eixopresas, mode="lines",
+                              name=dictambiente.presa, line=dict(color="royalblue", width=4)))
 
-        fig.add_trace(go.Scatter(x=eixo_tempo, y=eixo_predadores, mode="lines",
-                                  name=dictambiente.predador, line=dict(color="firebrick", width=4)))
+    fig.add_trace(go.Scatter(x=eixotempo, y=eixopredadores, mode="lines",
+                              name=dictambiente.predador, line=dict(color="firebrick", width=4)))
 
-        fig.update_layout(
-            title="Modelo Predador-Presa " + dictambiente.nome + " | Tentativa vencedora: " + str(tenativavencedora),
-            xaxis_title="Tempo (anos)",
-            yaxis_title="População",
-            template="plotly_white"
-        )
+    titulo_resultado = f"Tentativa vencedora: {tenativavencedora}" if ganhou else f"Todos extintos | Última tentativa: {tenativavencedora}"
 
-        fig.show()
+    fig.update_layout(
+        title="Modelo Predador-Presa " + dictambiente.nome + " | " + titulo_resultado,
+        xaxis_title="Tempo (anos)",
+        yaxis_title="População",
+        template="plotly_white"
+    )
 
-    else:
+    fig.show()
+
+    if not ganhou:
         print("Fim de jogo! Todos foram extintos. U ´꓃ ` U")
-        print("O histórico das tentativas foi salvo no CSV.")
+    print("O histórico das tentativas foi salvo no CSV | (Verifique a pasta:'Resultados').")
