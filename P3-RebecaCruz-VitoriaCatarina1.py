@@ -6,6 +6,7 @@ Universidade Federal do Rio de Janeiro
 Prof. Pedro Torres
 
 === TRABALHO FINAL ===
+
 Dupla: Rebeca Cruz e Vitória Catarina
 
 DINAMIPY é um jogo de tentativa-erro baseado na Equação de Lotka-Volterra.
@@ -89,11 +90,12 @@ class PredadorPresa:
 
     def calculotaxa(self, x, y):
         # Essa é a fórmula do Lotka-Volterra
-        taxa_x = self.alpha * x - self.beta * x * y
-        taxa_y = self.delta * x * y - self.gamma * y
+        taxa_x = self.alpha * x - self.beta * x * y #Calculo de presa
+        taxa_y = self.delta * x * y - self.gamma * y #Calculo de predador
         return taxa_x, taxa_y
-
-    def extincao (self, x, y):
+    
+    @staticmethod
+    def extincao (x, y):
         #Define o que faz a população de presas (x) e de predadores (y) entrar em extinção.
         if x < 1: #Se o x for menor do que 1 as presas são extintas.
             return "As presas entraram em extinção !!"
